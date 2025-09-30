@@ -1,0 +1,12 @@
+<!-- clients/templates/clients/client_form.html -->
+{% extends 'clients/base.html' %}
+{% block title %}Add Client{% endblock %}
+
+{% block content %}
+  <h2>Add a New Client</h2>
+  <form method="POST">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Save</button>
+  </form>
+{% endblock %}
