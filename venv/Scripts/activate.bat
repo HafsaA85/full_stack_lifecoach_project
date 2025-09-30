@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set "VIRTUAL_ENV=C:\Users\Adeel Shafqat\full_stack_project\venv"
+set "VIRTUAL_ENV=C:\hafsa-bootcamp\full_stack_project\venv"
 
 if not defined PROMPT set PROMPT=$P$G
 
