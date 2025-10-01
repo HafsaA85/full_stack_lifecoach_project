@@ -6,6 +6,8 @@ from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+print(os.environ.get("DATABASE_URL"))
+
 SECRET_KEY = config('SECRET_KEY', default='your-default-secret')
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
@@ -61,6 +63,7 @@ DATABASES = {
         default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}"
     )
 }
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
