@@ -1,12 +1,10 @@
 import os
-from pathlib import Path
 import dj_database_url
+from pathlib import Path
 from decouple import config
 
-
+print("DATABASE_URL from .env:", config('DATABASE_URL'))
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-print(os.environ.get("DATABASE_URL"))
 
 SECRET_KEY = config('SECRET_KEY', default='your-default-secret')
 DEBUG = config('DEBUG', default=True, cast=bool)
@@ -60,10 +58,11 @@ WSGI_APPLICATION = 'full_stack_project.wsgi.application'
 # Database
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}"
+        default=config('DATABASE_URL')
     )
 }
 
+AUTH_USER_MODEL = 'clients.Client'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
