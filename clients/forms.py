@@ -1,17 +1,14 @@
+# clients/forms.py
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 from .models import Client
 
-class ClientSignupForm(forms.ModelForm):
+class ClientSignupForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    phone = forms.CharField(max_length=15, required=False)
+    message = forms.CharField(widget=forms.Textarea, required=False)
+
     class Meta:
-        model = Client
-        fields = ['first_name', 'last_name', 'email', 'phone', 'message']
-
-        # clients/forms.py
-
-from django.contrib.auth.forms import AuthenticationForm
-
-class ClientLoginForm(AuthenticationForm):
-    username = forms.CharField(label="Email or Username", max_length=150)
-    password = forms.CharField(label="Password", widget=forms.PasswordInput)
-
-
+        model = User
+        fields = ['username', 'email', 'password1', 'password2', 'phone', 'message']
