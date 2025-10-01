@@ -35,31 +35,37 @@ def notifications_view(request):
 
 
 
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib import messages
+from django import forms
+
+
+# A simple login form
+class LoginForm(forms.Form):
+    username = forms.CharField(label="Username", max_length=150)
+    password = forms.CharField(widget=forms.PasswordInput, label="Password")
+
+
 def client_login(request):
-    """
-    Handles client login.
-    - Displays login form on GET request.
-    - Authenticates and logs in the user on POST request.
-    - Redirects to home page on successful login.
-    - Shows error message on invalid credentials.
-    """
-    if request.user.is_authenticated:
-        # Redirect already logged-in users to home
-        return redirect('home')
-
-    form = ClientLoginForm(request, data=request.POST or None)
-
     if request.method == "POST":
+        form = LoginForm(request.POST)
         if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            messages.success(request, "Login successful!")
-            return redirect('home')
-        else:
-            messages.error(request, "Invalid username or password.")
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password"]
 
-    return render(request, 'clients/client_login.html', {'form': form})
+            user = authenticate(request, username=username, password=password)
 
+            if user is not None:
+                login(request, user)        # ✅ correct usage
+                messages.success(request, f"Welcome back, {user.username}!")
+                return redirect("home")     # or your dashboard
+            else:
+                messages.error(request, "Invalid username or password.")
+    else:
+        form = LoginForm()
+
+    return render(request, "clients/login.html", {"form": form})
 
 
 
