@@ -1,75 +1,63 @@
-from django import forms
 from django.shortcuts import render, redirect
-from .forms import ClientSignupForm
-from .models import Client
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, authenticate
+from django.contrib.auth.models import User
+from django.contrib.auth import login as auth_login, authenticate, logout as auth_logout
+from .forms import ClientSignupForm, ClientLoginForm
 from django.contrib import messages
-from .forms import ClientLoginForm
-
 
 def home(request):
-    # Render a home page template (not the signup form)
-    return render(request, 'clients/home.html')
-
+    return render(request, 'clients/home.html')  
 
 def client_signup(request):
     if request.method == 'POST':
         form = ClientSignupForm(request.POST)
         if form.is_valid():
-            user = form.save()  # creates User with password
-            Client.objects.create(
-                user=user,
-                phone=form.cleaned_data.get('phone'),
-                message=form.cleaned_data.get('message')
+            # Create Django user
+            user = User.objects.create_user(
+                username=form.cleaned_data['email'],  # email as username
+                email=form.cleaned_data['email'],
+                password=form.cleaned_data['password'],
+                first_name=form.cleaned_data['first_name'],
+                last_name=form.cleaned_data['last_name']
             )
-            messages.success(request, "Signup successful! You can now log in.")
-            return redirect('login')
+            
+            # Create Client profile linked to user
+            client = form.save(commit=False)
+            client.user = user
+            client.save()
+
+            auth_login(request, user)  # log in user
+            return redirect('home')
     else:
         form = ClientSignupForm()
-    return render(request, 'clients/client_signup.html', {'form': form})
 
+    return render(request, 'clients/client_signup.html', {'form': form})
 
 def signup_success(request):
     return render(request, 'clients/signup_success.html')
 
-
-from django.shortcuts import render
-
-
-@login_required
-def notifications_view(request):
-    notifications = request.user.notification_set.all().order_by('-timestamp')
-    return render(request, 'clients/notifications.html', {'notifications': notifications})
-
-# A simple login form
-class LoginForm(forms.Form):
-    username = forms.CharField(label="Username", max_length=150)
-    password = forms.CharField(widget=forms.PasswordInput, label="Password")
-
-
+# Login view
 def client_login(request):
-    if request.method == "POST":
-        form = LoginForm(request.POST)
+    if request.method == 'POST':
+        form = ClientLoginForm(data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data["username"]
-            password = form.cleaned_data["password"]
-
-            user = authenticate(request, username=username, password=password)
-
-            if user is not None:
-                login(request, user)        # ✅ correct usage
-                messages.success(request, f"Welcome back, {user.username}!")
-                return redirect("home")     # or your dashboard
-            else:
-                messages.error(request, "Invalid username or password.")
+            user = form.get_user()
+            auth_login(request, user)
+            messages.success(request, "Login successful!")
+            return redirect('home')
+        else:
+            messages.error(request, "Invalid username or password.")
     else:
-        form = LoginForm()
+        form = ClientLoginForm()
 
-    return render(request, "clients/login.html", {"form": form})
-
-
+    return render(request, 'clients/login.html', {'form': form})
 
 
+# Logout view
+def client_logout(request):
+    auth_logout(request)
+    messages.info(request, "You have been logged out.")
+    return redirect('home')
 
-
+def notifications_view(request):
+    # You can later fetch notifications from the database
+    return render(request, 'clients/notifications.html')
