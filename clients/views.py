@@ -5,6 +5,10 @@ from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from .forms import ClientLoginForm
 
+def home(request):
+    # Render a home page template (not the signup form)
+    return render(request, 'clients/home.html')
+
 def client_signup(request):
     if request.method == 'POST':
         form = ClientSignupForm(request.POST)
