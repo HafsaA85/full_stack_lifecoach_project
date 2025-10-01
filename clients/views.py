@@ -1,5 +1,7 @@
+from django import forms
 from django.shortcuts import render, redirect
 from .forms import ClientSignupForm
+from .models import Client
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.contrib import messages
@@ -10,16 +12,23 @@ def home(request):
     # Render a home page template (not the signup form)
     return render(request, 'clients/home.html')
 
+
 def client_signup(request):
     if request.method == 'POST':
         form = ClientSignupForm(request.POST)
         if form.is_valid():
-            form.save()
-            # Redirect to your existing success page
-            return redirect('signup_success')
+            user = form.save()  # creates User with password
+            Client.objects.create(
+                user=user,
+                phone=form.cleaned_data.get('phone'),
+                message=form.cleaned_data.get('message')
+            )
+            messages.success(request, "Signup successful! You can now log in.")
+            return redirect('login')
     else:
         form = ClientSignupForm()
     return render(request, 'clients/client_signup.html', {'form': form})
+
 
 def signup_success(request):
     return render(request, 'clients/signup_success.html')
@@ -32,14 +41,6 @@ from django.shortcuts import render
 def notifications_view(request):
     notifications = request.user.notification_set.all().order_by('-timestamp')
     return render(request, 'clients/notifications.html', {'notifications': notifications})
-
-
-
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib import messages
-from django import forms
-
 
 # A simple login form
 class LoginForm(forms.Form):
