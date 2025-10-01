@@ -13,14 +13,21 @@
   <link rel="stylesheet" href="{% static 'clients/css/style.css' %}">
 </head>
 <body>
+  
   <header class="mb-4">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container">
-        <a class="navbar-brand" href="{% url 'client_signup' %}">Clients App</a>
+        <a class="navbar-brand" href="{% url 'client_signup' %}">Empowering Minds Lifecoaching</a>
         <div class="collapse navbar-collapse">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
               <a class="nav-link" href="{% url 'client_signup' %}">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/">Sign Up</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/">Login</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/admin/">Admin</a>
@@ -36,7 +43,7 @@
   </main>
 
   <footer class="mt-5 text-center">
-    <p>&copy; 2025 Clients App</p>
+    <p>&copy; 2025 Empowering Minds Lifecoaching</p>
   </footer>
 
   <!-- Bootstrap JS -->
