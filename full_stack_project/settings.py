@@ -1,16 +1,34 @@
 import os
-from pathlib import Path
 import dj_database_url
 from decouple import config
-
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-print(os.environ.get("DATABASE_URL"))
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+
+
+
+# Change the env import to use absolute path
+ENV_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'env.py')
+if os.path.exists(ENV_PATH):
+    import sys
+    sys.path.append(os.path.dirname(ENV_PATH))
+    import env
+
+
+
+# Use config() for all environment variables
 SECRET_KEY = config('SECRET_KEY', default='your-default-secret')
 DEBUG = config('DEBUG', default=True, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
+
+# Update database configuration
+DATABASES = {
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+}
 
 
 # Application definition
@@ -55,15 +73,11 @@ TEMPLATES = [
     },
 ]
 
+
+
+
+
 WSGI_APPLICATION = 'full_stack_project.wsgi.application'
-
-# Database
-DATABASES = {
-    'default': dj_database_url.config(
-        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}"
-    )
-}
-
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
